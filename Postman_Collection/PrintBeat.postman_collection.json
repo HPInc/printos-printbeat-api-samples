@@ -1,0 +1,508 @@
+{
+	"info": {
+		"_postman_id": "07842c22-984d-4a16-a40d-de4d1745a670",
+		"name": "PrintBeat-ColorBeat",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Historic data",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "29babdbb-ac72-472b-b86a-35ec08ac7419",
+						"type": "text/javascript",
+						"exec": [
+							"var key = postman.getEnvironmentVariable(\"key\");",
+							"var secret = postman.getEnvironmentVariable(\"secret\");",
+							"var kpi = postman.getEnvironmentVariable(\"kpi\");",
+							"var endpoint = \"/externalApi/v1/Historic/\" + kpi;",
+							"var headers = createHeaders (\"GET\", endpoint );",
+							"",
+							"postman.setEnvironmentVariable(\"hmacHeader\", headers[0]);",
+							"postman.setEnvironmentVariable(\"timestamp\", headers[1]);",
+							"",
+							"function createHeaders(method, path) {",
+							"    var timestamp = (new Date()).toISOString();",
+							"    ",
+							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
+							"    console.log('Creating hash with string ', toSign);",
+							"    var hash = CryptoJS.HmacSHA1(toSign, secret);",
+							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
+							"    var headers = [",
+							"      key + \":\" + sig,",
+							"      timestamp,",
+							"      \"SHA1\"",
+							"    ];",
+							"    return headers;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-hp-hmac-authentication",
+						"value": "{{hmacHeader}}"
+					},
+					{
+						"key": "x-hp-hmac-date",
+						"value": "{{timestamp}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SmsHost}}/printbeat/externalApi/v1/Historic/{{kpi}}?devices=50110187&devices=51000178&from=2018-01-03 00:00:00&to=2018-10-03 00:00:00&resolution=Week&unitSystem=Metric",
+					"host": [
+						"{{SmsHost}}"
+					],
+					"path": [
+						"printbeat",
+						"externalApi",
+						"v1",
+						"Historic",
+						"{{kpi}}"
+					],
+					"query": [
+						{
+							"key": "devices",
+							"value": "50110187"
+						},
+						{
+							"key": "devices",
+							"value": "51000178"
+						},
+						{
+							"key": "from",
+							"value": "2018-01-03 00:00:00"
+						},
+						{
+							"key": "to",
+							"value": "2018-10-03 00:00:00"
+						},
+						{
+							"key": "resolution",
+							"value": "Week"
+						},
+						{
+							"key": "unitSystem",
+							"value": "Metric"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get real time device data",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a7d162b7-d370-4a9c-a0b5-c049fc9d16b1",
+						"type": "text/javascript",
+						"exec": [
+							"var key = postman.getEnvironmentVariable(\"key\");",
+							"var secret = postman.getEnvironmentVariable(\"secret\");",
+							"var kpi = postman.getEnvironmentVariable(\"kpi\");",
+							"var endpoint = \"/externalApi/v1/RealTimeData\";",
+							"var headers = createHeaders (\"GET\", endpoint );",
+							"",
+							"postman.setEnvironmentVariable(\"hmacHeader\", headers[0]);",
+							"postman.setEnvironmentVariable(\"timestamp\", headers[1]);",
+							"",
+							"function createHeaders(method, path) {",
+							"    var timestamp = (new Date()).toISOString();",
+							"    ",
+							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
+							"    console.log('Creating hash with string ', toSign);",
+							"    var hash = CryptoJS.HmacSHA1(toSign, secret);",
+							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
+							"    var headers = [",
+							"      key + \":\" + sig,",
+							"      timestamp,",
+							"      \"SHA1\"",
+							"    ];",
+							"    return headers;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-hp-hmac-authentication",
+						"value": "{{hmacHeader}}"
+					},
+					{
+						"key": "x-hp-hmac-date",
+						"value": "{{timestamp}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SmsHost}}/printbeat/externalApi/v1/RealTimeData?devices={{devices}}&resolution={{resolution}}&unitSystem={{unitSystem}}",
+					"host": [
+						"{{SmsHost}}"
+					],
+					"path": [
+						"printbeat",
+						"externalApi",
+						"v1",
+						"RealTimeData"
+					],
+					"query": [
+						{
+							"key": "devices",
+							"value": "{{devices}}"
+						},
+						{
+							"key": "resolution",
+							"value": "{{resolution}}"
+						},
+						{
+							"key": "unitSystem",
+							"value": "{{unitSystem}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Data By Time Frame",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "b29ff824-43b8-4425-b67a-110974a5b61d",
+						"type": "text/javascript",
+						"exec": [
+							"var key = postman.getEnvironmentVariable(\"key\");",
+							"var secret = postman.getEnvironmentVariable(\"secret\");",
+							"var endpoint = \"/externalApi/v1/colorbeat/dataByTimeFrame\";",
+							"var headers = createHeaders (\"GET\", endpoint );",
+							"",
+							"postman.setEnvironmentVariable(\"hmacHeader\", headers[0]);",
+							"postman.setEnvironmentVariable(\"timestamp\", headers[1]);",
+							"",
+							"function createHeaders(method, path) {",
+							"    var timestamp = (new Date()).toISOString();",
+							"    ",
+							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
+							"    console.log('Creating hash with string ', toSign);",
+							"    var hash = CryptoJS.HmacSHA1(toSign, secret);",
+							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
+							"    var headers = [",
+							"      key + \":\" + sig,",
+							"      timestamp,",
+							"      \"SHA1\"",
+							"    ];",
+							"    return headers;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-hp-hmac-authentication",
+						"value": "{{hmacHeader}}"
+					},
+					{
+						"key": "x-hp-hmac-date",
+						"value": "{{timestamp}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SmsHost}}/printbeat/externalApi/v1/colorbeat/dataByTimeFrame?devices={{devices}}&from=2018-08-01 00:00:00",
+					"host": [
+						"{{SmsHost}}"
+					],
+					"path": [
+						"printbeat",
+						"externalApi",
+						"v1",
+						"colorbeat",
+						"dataByTimeFrame"
+					],
+					"query": [
+						{
+							"key": "devices",
+							"value": "{{devices}}"
+						},
+						{
+							"key": "from",
+							"value": "2018-08-01 00:00:00"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Raw Data",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "ba4e54a4-27bc-4a47-8b45-e4dc0a68160e",
+						"type": "text/javascript",
+						"exec": [
+							"var key = postman.getEnvironmentVariable(\"key\");",
+							"var secret = postman.getEnvironmentVariable(\"secret\");",
+							"var endpoint = \"/externalApi/v1/colorbeat/rawdata\";",
+							"var headers = createHeaders (\"GET\", endpoint );",
+							"",
+							"postman.setEnvironmentVariable(\"hmacHeader\", headers[0]);",
+							"postman.setEnvironmentVariable(\"timestamp\", headers[1]);",
+							"",
+							"function createHeaders(method, path) {",
+							"    var timestamp = (new Date()).toISOString();",
+							"    ",
+							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
+							"    console.log('Creating hash with string ', toSign);",
+							"    var hash = CryptoJS.HmacSHA1(toSign, secret);",
+							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
+							"    var headers = [",
+							"      key + \":\" + sig,",
+							"      timestamp,",
+							"      \"SHA1\"",
+							"    ];",
+							"    return headers;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-hp-hmac-authentication",
+						"value": "{{hmacHeader}}"
+					},
+					{
+						"key": "x-hp-hmac-date",
+						"value": "{{timestamp}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SmsHost}}/printbeat/externalApi/v1/colorbeat/rawdata?id={{id}}",
+					"host": [
+						"{{SmsHost}}"
+					],
+					"path": [
+						"printbeat",
+						"externalApi",
+						"v1",
+						"colorbeat",
+						"rawdata"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "{{id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get OEE Chart",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "3e5a80bd-abe8-4c35-b00c-3bee6502e4bb",
+						"type": "text/javascript",
+						"exec": [
+							"var key = postman.getEnvironmentVariable(\"key\");",
+							"var secret = postman.getEnvironmentVariable(\"secret\");",
+							"var endpoint = \"/externalApi/v1/oee/chart\";",
+							"var headers = createHeaders (\"GET\", endpoint );",
+							"",
+							"postman.setEnvironmentVariable(\"hmacHeader\", headers[0]);",
+							"postman.setEnvironmentVariable(\"timestamp\", headers[1]);",
+							"",
+							"function createHeaders(method, path) {",
+							"    var timestamp = (new Date()).toISOString();",
+							"    ",
+							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
+							"    console.log('Creating hash with string ', toSign);",
+							"    var hash = CryptoJS.HmacSHA1(toSign, secret);",
+							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
+							"    var headers = [",
+							"      key + \":\" + sig,",
+							"      timestamp,",
+							"      \"SHA1\"",
+							"    ];",
+							"    return headers;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-hp-hmac-authentication",
+						"value": "{{hmacHeader}}"
+					},
+					{
+						"key": "x-hp-hmac-date",
+						"value": "{{timestamp}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SmsHost}}/printbeat/externalApi/v1/oee/chart?devices={{devices}}&from=2018-08-01 00:00:00&resolution={{resolution}}",
+					"host": [
+						"{{SmsHost}}"
+					],
+					"path": [
+						"printbeat",
+						"externalApi",
+						"v1",
+						"oee",
+						"chart"
+					],
+					"query": [
+						{
+							"key": "devices",
+							"value": "{{devices}}"
+						},
+						{
+							"key": "from",
+							"value": "2018-08-01 00:00:00"
+						},
+						{
+							"key": "resolution",
+							"value": "{{resolution}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get OEE Drilldown",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "a4763017-aec4-4f49-af2a-9045c921863c",
+						"type": "text/javascript",
+						"exec": [
+							"var key = postman.getEnvironmentVariable(\"key\");",
+							"var secret = postman.getEnvironmentVariable(\"secret\");",
+							"var endpoint = \"/externalApi/v1/oee/drilldown\";",
+							"var headers = createHeaders (\"GET\", endpoint );",
+							"",
+							"postman.setEnvironmentVariable(\"hmacHeader\", headers[0]);",
+							"postman.setEnvironmentVariable(\"timestamp\", headers[1]);",
+							"",
+							"function createHeaders(method, path) {",
+							"    var timestamp = (new Date()).toISOString();",
+							"    ",
+							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
+							"    console.log('Creating hash with string ', toSign);",
+							"    var hash = CryptoJS.HmacSHA1(toSign, secret);",
+							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
+							"    var headers = [",
+							"      key + \":\" + sig,",
+							"      timestamp,",
+							"      \"SHA1\"",
+							"    ];",
+							"    return headers;",
+							"}"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "x-hp-hmac-authentication",
+						"value": "{{hmacHeader}}"
+					},
+					{
+						"key": "x-hp-hmac-date",
+						"value": "{{timestamp}}"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{SmsHost}}/printbeat/externalApi/v1/oee/drilldown?devices={{devices}}&from=2018-08-01 00:00:00&resolution={{resolution}}",
+					"host": [
+						"{{SmsHost}}"
+					],
+					"path": [
+						"printbeat",
+						"externalApi",
+						"v1",
+						"oee",
+						"drilldown"
+					],
+					"query": [
+						{
+							"key": "devices",
+							"value": "{{devices}}"
+						},
+						{
+							"key": "from",
+							"value": "2018-08-01 00:00:00"
+						},
+						{
+							"key": "resolution",
+							"value": "{{resolution}}"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
