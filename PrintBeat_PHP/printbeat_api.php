@@ -9,7 +9,7 @@ $key = '';   #enter the PrintBeat key generated from your PrintOS account here
 $secret = '';   #enter the PrintBeat secret generated from your PrintOS account here
 
 #enter the list of press serial numbers from your account
-$devices = array("50110187", "51000178");
+$devices = ["50110187", "51000178"];
 #for API calls that require a date range enter the To and From dates below (notice no 'T' character in date stamp)
 $fromDate = '2018-06-03 00:00:00';
 $toDate = '2018-11-20 00:00:00';
@@ -23,9 +23,9 @@ $id = 1;
 #API Endpoint Calls (uncomment each line to make that API Endpoint call)
 #--------------------------------------------------------------#
 
-getHistoricKPI('OverallPerformance', $devices, $fromDate, $toDate, $resolution, $unitSystem);  //KPIs are 'OverallPerformance', 'PrintVolume'
-#getRealTimeData($devices, $resolution, $unitSystem);  
-#getDataByTimeFrame($devices, $fromDate, NULL);  
+getHistoricKPI('OverallPerformance', $devices, $fromDate, $toDate, $resolution, $unitSystem); //KPIs are'OverallPerformance', 'PrintVolume'
+#getRealTimeData($devices, $resolution, $unitSystem);
+#getDataByTimeFrame($devices, $fromDate, null);
 #getRawData($id);
 #getOEEChart($devices, $fromDate, $toDate, $resolution);
 #getOEEDrilldown($devices, $fromDate, $toDate, $resolution);
@@ -33,6 +33,7 @@ getHistoricKPI('OverallPerformance', $devices, $fromDate, $toDate, $resolution, 
 
 #PrintBeat APIs
 #--------------------------------------------------------------#
+
 
 /**
  * Gets historical data based on a defined KPI.
@@ -44,87 +45,63 @@ getHistoricKPI('OverallPerformance', $devices, $fromDate, $toDate, $resolution, 
  * @param $resolution - time resolution to show data 'Day' 'Week' or 'Month'
  * @param $unitSystem - units to display information in 'Imperial' or 'Metric' 
  */
-function getHistoricKPI($kpi, $devices, $fromDate, $toDate, $resolution, $unitSystem) {
-	echo "Getting historical date based on KPI" . $kpi . "</br>";
-	$queryString = '?';
-	#add devices to query string
-	if(!empty($devices)){
-		$deviceQueryString = "";
-		for($i = 0; $i < count($devices); $i++){
-			if ($i > 0){
-				$deviceQueryString = $deviceQueryString . '&'; 
-			}
-			$deviceQueryString = $deviceQueryString . 'devices=' . $devices[$i];
-		}
-		$queryString = $queryString . $deviceQueryString;
-	}
-	#add from/to dates to query string
-	$queryString = $queryString . '&from=' . $fromDate;
-	if ($toDate != null){
-		$queryString = $queryString . '&to=' . $toDate;
-	}
-	#add resolution and unit system
-	$queryString = $queryString . '&resolution=' . $resolution . '&unitSystem=' . $unitSystem;
-	echo "Query string is: " . $queryString . "</br>";
+function getHistoricKPI($kpi = '', $devices = [], $fromDate = null, $toDate = null, $resolution = null, $unitSystem = null)
+{
+	echo "Getting historical date based on KPI" . $kpi . PHP_EOL;
+	$query = [
+		'from' => $fromDate,
+		'to' => $toDate,
+		'resolution' => $resolution,
+		'unitSystem' => $unitSystem,
+	];
+	$devices = array_reduce($devices, 'reduceDevicesToQuery', '');
+	$query = array_filter($query);
+	$queryString = '?' . http_build_query($query) . $devices;
+	echo "Query string is: " . urldecode($queryString) . PHP_EOL;
 	$response = getRequest('/externalApi/v1/Historic/' . $kpi, $queryString);
 	printInfo($response);
 }
 
 /**
  * Gets real time data for your devices.
- *  
+ *
  * @param $devices - array of device serial numbers to query
  * @param $resolution - time resolution to show data 'Day' 'Week' or 'Month'
- * @param $unitSystem - units to display information in 'Imperial' or 'Metric' 
+ * @param $unitSystem - units to display information in 'Imperial' or 'Metric'
  */
-function getrealTimeData($devices, $resolution, $unitSystem) {
-	echo "Getting data from presses</br>";
-	$queryString = '?';
-	#add devices to query string
-	if(!empty($devices)){
-		$deviceQueryString = "";
-		for($i = 0; $i < count($devices); $i++){
-			if ($i > 0){
-				$deviceQueryString = $deviceQueryString . '&'; 
-			}
-			$deviceQueryString = $deviceQueryString . 'devices=' . $devices[$i];
-		}
-		$queryString = $queryString . $deviceQueryString;
-	}
-	#add resolution and unit system
-	$queryString = $queryString . '&resolution=' . $resolution . '&unitSystem=' . $unitSystem;
-	echo "Query string is: " . $queryString . "</br>";
+function getrealTimeData($devices = [], $resolution = null, $unitSystem = null)
+{
+	echo "Getting data from presses" . PHP_EOL;
+	$query = [
+		'resolution' => $resolution,
+		'unitSystem' => $unitSystem,
+	];
+	$devices = array_reduce($devices, 'reduceDevicesToQuery', '');
+	$query = array_filter($query);
+	$queryString = '?' . http_build_query($query) . $devices;
+	echo "Query string is: " . urldecode($queryString) . PHP_EOL;
 	$response = getRequest('/externalApi/v1/RealTimeData', $queryString);
 	printInfo($response);
 }
 
 /**
  * Gets ColorBeat data for specific time frame
- * 
+ *
  * @param $devices - array of device serial numbers to query
- * @param $fromDate - date to start query from 'YYYY-MM-DD hh:mm:ss' 
+ * @param $fromDate - date to start query from 'YYYY-MM-DD hh:mm:ss'
  * @param $toDate - date to end query at 'YYYY-MM-DD hh:mm:ss'
  */
-function getDataByTimeFrame($devices, $fromDate, $toDate) {
-	echo "Getting ColorBeat data in a time frame</br>";
-	$queryString = '?';
-	#add devices to query string
-	if(!empty($devices)){
-		$deviceQueryString = "";
-		for($i = 0; $i < count($devices); $i++){
-			if ($i > 0){
-				$deviceQueryString = $deviceQueryString . '&'; 
-			}
-			$deviceQueryString = $deviceQueryString . 'devices=' . $devices[$i];
-		}
-		$queryString = $queryString . $deviceQueryString;
-	}
-	#add from/to dates to query string
-	$queryString = $queryString . '&from=' . $fromDate;
-	if ($toDate != null){
-		$queryString = $queryString . '&to=' . $toDate;
-	}
-	echo "Query string is: " . $queryString . "</br>";
+function getDataByTimeFrame($devices = [], $fromDate = null, $toDate = null)
+{
+	echo "Getting ColorBeat data in a time frame" . PHP_EOL;
+	$query = [
+		'from' => $fromDate,
+		'to' => $toDate,
+	];
+	$devices = array_reduce($devices, 'reduceDevicesToQuery', '');
+	$query = array_filter($query);
+	$queryString = '?' . http_build_query($query) . $devices;
+	echo "Query string is: " . urldecode($queryString) . PHP_EOL;
 	$response = getRequest('/externalApi/v1/colorbeat/dataByTimeFrame', $queryString);
 	printInfo($response);
 }
@@ -132,8 +109,9 @@ function getDataByTimeFrame($devices, $fromDate, $toDate) {
 /**
  * Gets raw data out of PrintBeat ColorBeat based on a provided measurement ID
  */
-function getRawData($id) {
-	echo "Getting ColorBeat raw data</br>";
+function getRawData($id)
+{
+	echo "Getting ColorBeat raw data" . PHP_EOL;
 	$queryString = '?id=' . $id;
 	$response = getRequest('/externalApi/v1/colorbeat/rawdata', $queryString);
 	printInfo($response);
@@ -141,34 +119,24 @@ function getRawData($id) {
 
 /**
  * Gets ColorBeat data for specific time frame
- * 
+ *
  * @param $devices - array of device serial numbers to query
- * @param $fromDate - date to start query from 'YYYY-MM-DD hh:mm:ss' 
+ * @param $fromDate - date to start query from 'YYYY-MM-DD hh:mm:ss'
  * @param $toDate - date to end query at 'YYYY-MM-DD hh:mm:ss'
  * @param $resolution - time resolution to show data 'Day' 'Week' or 'Month'
  */
-function getOEEChart($devices, $fromDate, $toDate, $resolution) {
-	echo "Getting OEE reports per press for a time range and resolution</br>";
-	$queryString = '?';
-	#add devices to query string
-	if(!empty($devices)){
-		$deviceQueryString = "";
-		for($i = 0; $i < count($devices); $i++){
-			if ($i > 0){
-				$deviceQueryString = $deviceQueryString . '&'; 
-			}
-			$deviceQueryString = $deviceQueryString . 'devices=' . $devices[$i];
-		}
-		$queryString = $queryString . $deviceQueryString;
-	}
-	#add from/to dates to query string
-	$queryString = $queryString . '&from=' . $fromDate;
-	if ($toDate != null){
-		$queryString = $queryString . '&to=' . $toDate;
-	}
-	#add resolution
-	$queryString = $queryString . '&resolution=' . $resolution;
-	echo "Query string is: " . $queryString . "</br>";
+function getOEEChart($devices = [], $fromDate = null, $toDate = null, $resolution = null)
+{
+	echo "Getting OEE reports per press for a time range and resolution" . PHP_EOL;
+	$query = [
+		'from' => $fromDate,
+		'to' => $toDate,
+		'resolution' => $resolution,
+	];
+	$devices = array_reduce($devices, 'reduceDevicesToQuery', '');
+	$query = array_filter($query);
+	$queryString = '?' . http_build_query($query) . $devices;
+	echo "Query string is: " . urldecode($queryString) . PHP_EOL;
 	$response = getRequest('/externalApi/v1/oee/chart', $queryString);
 	printInfo($response);
 }
@@ -182,28 +150,18 @@ function getOEEChart($devices, $fromDate, $toDate, $resolution) {
  * @param $toDate - date to end query at 'YYYY-MM-DD hh:mm:ss'
  * @param $resolution - time resolution to show data 'Day' 'Week' or 'Month'
  */
-function getOEEDrilldown($devices, $fromDate, $toDate, $resolution) {
-	echo "Getting OEE detailed reports for each KPI's availablility, performance and quality</br>";
-	$queryString = '?';
-	#add devices to query string
-	if(!empty($devices)){
-		$deviceQueryString = "";
-		for($i = 0; $i < count($devices); $i++){
-			if ($i > 0){
-				$deviceQueryString = $deviceQueryString . '&'; 
-			}
-			$deviceQueryString = $deviceQueryString . 'devices=' . $devices[$i];
-		}
-		$queryString = $queryString . $deviceQueryString;
-	}
-	#add from/to dates to query string
-	$queryString = $queryString . '&from=' . $fromDate;
-	if ($toDate != null){
-		$queryString = $queryString . '&to=' . $toDate;
-	}
-	#add resolution
-	$queryString = $queryString . '&resolution=' . $resolution;
-	echo "Query string is: " . $queryString . "</br>";
+function getOEEDrilldown($devices = [], $fromDate = null, $toDate = null, $resolution = null)
+{
+	echo "Getting OEE detailed reports for each KPI's availablility, performance and quality" . PHP_EOL;
+	$query = [
+		'from' => $fromDate,
+		'to' => $toDate,
+		'resolution' => $resolution,
+	];
+	$devices = array_reduce($devices, 'reduceDevicesToQuery', '');
+	$query = array_filter($query);
+	$queryString = '?' . http_build_query($query) . $devices;
+	echo "Query string is: " . urldecode($queryString) . PHP_EOL;
 	$response = getRequest('/externalApi/v1/oee/drilldown', $queryString);
 	printInfo($response);
 }
@@ -218,10 +176,12 @@ function getOEEDrilldown($devices, $fromDate, $toDate, $resolution) {
  * @param $path - api path
  * @param $timestamp - time in utc format 
  */
-function createHmacAuth($method, $path, $timestamp) {
+function createHmacAuth($method, $path, $timestamp)
+{
 	global $key, $secret;
 	$str = $method . ' ' . $path . $timestamp;
 	$hash = hash_hmac('sha1', $str, $secret);
+
 	return $key . ':' . $hash;
 }
 
@@ -230,15 +190,18 @@ function createHmacAuth($method, $path, $timestamp) {
  *
  * @param $response - http response of the requests
  */
-function printInfo($response) {
+function printInfo($response)
+{
 	// Check for errors
-	if($response === FALSE){
+	if ($response === false) {
 		echo $response . "</br>";
 		die($response);
 	}
 
-	$responseData = json_decode($response, TRUE);
-	echo "<pre>"; print_r($responseData); echo "</pre>";
+	$responseData = json_decode($response, true);
+	echo "<pre>";
+	print_r($responseData);
+	echo "</pre>";
 }
 
 
@@ -253,28 +216,47 @@ function printInfo($response) {
  *
  * Note: $baseUrl . $path will be the full url to call a certain api.
  */
-function getRequest($path, $queryString) {
+function getRequest($path, $queryString)
+{
 	global $baseUrl;
-	
+
 	$t = microtime(true);
-	$micro = sprintf("%03d",($t - floor($t)) * 1000);
-	$time = gmdate('Y-m-d\TH:i:s.', $t).$micro.'Z';
+	$micro = sprintf("%03d", ($t - floor($t)) * 1000);
+	$time = gmdate('Y-m-d\TH:i:s.', $t) . $micro . 'Z';
 	$auth = createHmacAuth('GET', $path, $time);
 
-	$options = array(
-		'http' => array(
-			'header'=>  "Content-Type: application/json\r\n" .
-						"x-hp-hmac-date: " . $time . "\r\n" .
-						"x-hp-hmac-authentication: " . $auth . "\r\n",
-			'method'  => 'GET',
+	$headers = [
+		'Content-Type: application/json',
+		"x-hp-hmac-date: " . $time,
+		"x-hp-hmac-authentication: " . $auth,
+	];
+
+	$options = [
+		'http' => [
+			'header' => implode("\r\n", $headers),
+			'method' => 'GET',
 			#'ignore_errors' => true,  //ignore errors allows you to capture response message on failed API calls
 			#'proxy' => 'web-proxy:8080', // If you are operating behind a proxy, uncomment and specify the proxy address and port.
 			#'request_fulluri' => true,
-		),
-	); 
+		],
+	];
 
 	$context = stream_context_create($options);
+
 	return file_get_contents($baseUrl . $path . $queryString, false, $context);
+}
+
+/**
+ * For each device add a param
+ * @param $deviceQueryString
+ * @param $device
+ * @return string
+ */
+function reduceDevicesToQuery($deviceQueryString, $device)
+{
+	$deviceQueryString .= '&devices=' . $device;
+
+	return $deviceQueryString;
 }
 
 ?>
