@@ -221,7 +221,7 @@ function getOEEDrilldown($devices, $fromDate, $toDate, $resolution) {
 function createHmacAuth($method, $path, $timestamp) {
 	global $key, $secret;
 	$str = $method . ' ' . $path . $timestamp;
-	$hash = hash_hmac('sha1', $str, $secret);
+	$hash = hash_hmac('sha256', $str, $secret);
 	return $key . ':' . $hash;
 }
 
