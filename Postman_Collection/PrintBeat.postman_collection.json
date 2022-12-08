@@ -1,8 +1,9 @@
 {
 	"info": {
-		"_postman_id": "07842c22-984d-4a16-a40d-de4d1745a670",
-		"name": "PrintBeat-ColorBeat",
-		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+		"_postman_id": "963d1eca-f677-426a-8f58-bf5cb47a0044",
+		"name": "PrintBeat-ColorBeat Copy",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "10916568"
 	},
 	"item": [
 		{
@@ -11,8 +12,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "29babdbb-ac72-472b-b86a-35ec08ac7419",
-						"type": "text/javascript",
 						"exec": [
 							"var key = postman.getEnvironmentVariable(\"key\");",
 							"var secret = postman.getEnvironmentVariable(\"secret\");",
@@ -28,16 +27,17 @@
 							"    ",
 							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
 							"    console.log('Creating hash with string ', toSign);",
-							"    var hash = CryptoJS.HmacSHA1(toSign, secret);",
+							"    var hash = CryptoJS.HmacSHA256(toSign, secret);",
 							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
 							"    var headers = [",
 							"      key + \":\" + sig,",
 							"      timestamp,",
-							"      \"SHA1\"",
+							"      \"SHA256\"",
 							"    ];",
 							"    return headers;",
 							"}"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -51,14 +51,15 @@
 					{
 						"key": "x-hp-hmac-date",
 						"value": "{{timestamp}}"
+					},
+					{
+						"key": "x-hp-hmac-algorithm",
+						"value": "SHA256",
+						"type": "text"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
-					"raw": "{{SmsHost}}/printbeat/externalApi/v1/Historic/{{kpi}}?devices=50110187&devices=51000178&from=2018-01-03 00:00:00&to=2018-10-03 00:00:00&resolution=Week&unitSystem=Metric",
+					"raw": "{{SmsHost}}/printbeat/externalApi/v1/Historic/{{kpi}}?devices={{devices}}&from=2022-12-00 00:00:00&to=2022-12-07 00:00:00&resolution=Week&unitSystem=Metric",
 					"host": [
 						"{{SmsHost}}"
 					],
@@ -72,19 +73,15 @@
 					"query": [
 						{
 							"key": "devices",
-							"value": "50110187"
-						},
-						{
-							"key": "devices",
-							"value": "51000178"
+							"value": "{{devices}}"
 						},
 						{
 							"key": "from",
-							"value": "2018-01-03 00:00:00"
+							"value": "2022-12-00 00:00:00"
 						},
 						{
 							"key": "to",
-							"value": "2018-10-03 00:00:00"
+							"value": "2022-12-07 00:00:00"
 						},
 						{
 							"key": "resolution",
@@ -105,8 +102,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "a7d162b7-d370-4a9c-a0b5-c049fc9d16b1",
-						"type": "text/javascript",
 						"exec": [
 							"var key = postman.getEnvironmentVariable(\"key\");",
 							"var secret = postman.getEnvironmentVariable(\"secret\");",
@@ -122,16 +117,17 @@
 							"    ",
 							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
 							"    console.log('Creating hash with string ', toSign);",
-							"    var hash = CryptoJS.HmacSHA1(toSign, secret);",
+							"    var hash = CryptoJS.HmacSHA256(toSign, secret);",
 							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
 							"    var headers = [",
 							"      key + \":\" + sig,",
 							"      timestamp,",
-							"      \"SHA1\"",
+							"      \"SHA256\"",
 							"    ];",
 							"    return headers;",
 							"}"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -145,12 +141,13 @@
 					{
 						"key": "x-hp-hmac-date",
 						"value": "{{timestamp}}"
+					},
+					{
+						"key": "x-hp-hmac-algorithm",
+						"value": "SHA256",
+						"type": "text"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SmsHost}}/printbeat/externalApi/v1/RealTimeData?devices={{devices}}&resolution={{resolution}}&unitSystem={{unitSystem}}",
 					"host": [
@@ -181,13 +178,176 @@
 			"response": []
 		},
 		{
+			"name": "POST Get Scitex Jobs",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var key = postman.getEnvironmentVariable(\"key\");",
+							"var secret = postman.getEnvironmentVariable(\"secret\");",
+							"var endpoint = '/externalApi/gsb/scitexJobs/records';",
+							"var headers = createHeaders (\"POST\", endpoint );",
+							"",
+							"postman.setEnvironmentVariable(\"hmacHeader\", headers[0]);",
+							"postman.setEnvironmentVariable(\"timestamp\", headers[1]);",
+							"",
+							"function createHeaders(method, path) {",
+							"    var timestamp = (new Date()).toISOString();",
+							"    ",
+							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
+							"    console.log('Creating hash with string ', toSign);",
+							"    var hash = CryptoJS.HmacSHA256(toSign, secret);",
+							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
+							"    var headers = [",
+							"      key + \":\" + sig,",
+							"      timestamp,",
+							"      \"SHA256\"",
+							"    ];",
+							"    return headers;",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "x-hp-hmac-authentication",
+						"value": "{{hmacHeader}}"
+					},
+					{
+						"key": "x-hp-hmac-date",
+						"value": "{{timestamp}}"
+					},
+					{
+						"key": "x-hp-hmac-algorithm",
+						"value": "SHA256",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"machineSns\": [\r\n        \"{{devices}}\"\r\n    ],\r\n    \"dateFrom\": \"2022-12-01T18:20:23.937Z\",\r\n    \"dateTo\": \"2022-12-07T18:20:23.937Z\",\r\n    \"startRow\": 0,\r\n    \"endRow\": 100,\r\n    \"selectedKpiTab\": \"{{kpi}}\",\r\n    \"searchString\": \"\",\r\n    \"sortExpression\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{SmsHost}}/printbeat/externalApi/gsb/scitexJobs/records",
+					"host": [
+						"{{SmsHost}}"
+					],
+					"path": [
+						"printbeat",
+						"externalApi",
+						"gsb",
+						"scitexJobs",
+						"records"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Large Format Pro Jobs",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var key = postman.getEnvironmentVariable(\"key\");",
+							"var secret = postman.getEnvironmentVariable(\"secret\");",
+							"var endpoint = \"/externalApi/gsb/jobs/records\";",
+							"var headers = createHeaders (\"GET\", endpoint );",
+							"",
+							"postman.setEnvironmentVariable(\"hmacHeader\", headers[0]);",
+							"postman.setEnvironmentVariable(\"timestamp\", headers[1]);",
+							"",
+							"function createHeaders(method, path) {",
+							"    var timestamp = (new Date()).toISOString();",
+							"    ",
+							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
+							"    console.log('Creating hash with string ', toSign);",
+							"    var hash = CryptoJS.HmacSHA256(toSign, secret);",
+							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
+							"    var headers = [",
+							"      key + \":\" + sig,",
+							"      timestamp,",
+							"      \"SHA256\"",
+							"    ];",
+							"    return headers;",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-hp-hmac-authentication",
+						"value": "{{hmacHeader}}"
+					},
+					{
+						"key": "x-hp-hmac-date",
+						"value": "{{timestamp}}"
+					},
+					{
+						"key": "x-hp-hmac-algorithm",
+						"value": "SHA256",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{SmsHost}}/printbeat/externalApi/gsb/jobs/records?serial={{devices}}&to={{to}}&from={{from}}&from_index={{from_index}}&to_index={{to_index}}",
+					"host": [
+						"{{SmsHost}}"
+					],
+					"path": [
+						"printbeat",
+						"externalApi",
+						"gsb",
+						"jobs",
+						"records"
+					],
+					"query": [
+						{
+							"key": "serial",
+							"value": "{{devices}}"
+						},
+						{
+							"key": "to",
+							"value": "{{to}}"
+						},
+						{
+							"key": "from",
+							"value": "{{from}}"
+						},
+						{
+							"key": "from_index",
+							"value": "{{from_index}}"
+						},
+						{
+							"key": "to_index",
+							"value": "{{to_index}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "Get Data By Time Frame",
 			"event": [
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "b29ff824-43b8-4425-b67a-110974a5b61d",
-						"type": "text/javascript",
 						"exec": [
 							"var key = postman.getEnvironmentVariable(\"key\");",
 							"var secret = postman.getEnvironmentVariable(\"secret\");",
@@ -202,16 +362,17 @@
 							"    ",
 							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
 							"    console.log('Creating hash with string ', toSign);",
-							"    var hash = CryptoJS.HmacSHA1(toSign, secret);",
+							"    var hash = CryptoJS.HmacSHA256(toSign, secret);",
 							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
 							"    var headers = [",
 							"      key + \":\" + sig,",
 							"      timestamp,",
-							"      \"SHA1\"",
+							"      \"SHA256\"",
 							"    ];",
 							"    return headers;",
 							"}"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -225,14 +386,15 @@
 					{
 						"key": "x-hp-hmac-date",
 						"value": "{{timestamp}}"
+					},
+					{
+						"key": "x-hp-hmac-algorithm",
+						"value": "SHA256",
+						"type": "text"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
-					"raw": "{{SmsHost}}/printbeat/externalApi/v1/colorbeat/dataByTimeFrame?devices={{devices}}&from=2018-08-01 00:00:00",
+					"raw": "{{SmsHost}}/printbeat/externalApi/v1/colorbeat/dataByTimeFrame?devices={{devices}}&from=2022-12-01 00:00:00",
 					"host": [
 						"{{SmsHost}}"
 					],
@@ -250,7 +412,7 @@
 						},
 						{
 							"key": "from",
-							"value": "2018-08-01 00:00:00"
+							"value": "2022-12-01 00:00:00"
 						}
 					]
 				}
@@ -263,8 +425,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "ba4e54a4-27bc-4a47-8b45-e4dc0a68160e",
-						"type": "text/javascript",
 						"exec": [
 							"var key = postman.getEnvironmentVariable(\"key\");",
 							"var secret = postman.getEnvironmentVariable(\"secret\");",
@@ -279,16 +439,17 @@
 							"    ",
 							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
 							"    console.log('Creating hash with string ', toSign);",
-							"    var hash = CryptoJS.HmacSHA1(toSign, secret);",
+							"    var hash = CryptoJS.HmacSHA256(toSign, secret);",
 							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
 							"    var headers = [",
 							"      key + \":\" + sig,",
 							"      timestamp,",
-							"      \"SHA1\"",
+							"      \"SHA256\"",
 							"    ];",
 							"    return headers;",
 							"}"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -306,12 +467,13 @@
 					{
 						"key": "x-hp-hmac-date",
 						"value": "{{timestamp}}"
+					},
+					{
+						"key": "x-hp-hmac-algorithm",
+						"value": "SHA256",
+						"type": "text"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
 					"raw": "{{SmsHost}}/printbeat/externalApi/v1/colorbeat/rawdata?id={{id}}",
 					"host": [
@@ -340,8 +502,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "3e5a80bd-abe8-4c35-b00c-3bee6502e4bb",
-						"type": "text/javascript",
 						"exec": [
 							"var key = postman.getEnvironmentVariable(\"key\");",
 							"var secret = postman.getEnvironmentVariable(\"secret\");",
@@ -356,16 +516,17 @@
 							"    ",
 							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
 							"    console.log('Creating hash with string ', toSign);",
-							"    var hash = CryptoJS.HmacSHA1(toSign, secret);",
+							"    var hash = CryptoJS.HmacSHA256(toSign, secret);",
 							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
 							"    var headers = [",
 							"      key + \":\" + sig,",
 							"      timestamp,",
-							"      \"SHA1\"",
+							"      \"SHA256\"",
 							"    ];",
 							"    return headers;",
 							"}"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -383,14 +544,15 @@
 					{
 						"key": "x-hp-hmac-date",
 						"value": "{{timestamp}}"
+					},
+					{
+						"key": "x-hp-hmac-algorithm",
+						"value": "SHA256",
+						"type": "text"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
-					"raw": "{{SmsHost}}/printbeat/externalApi/v1/oee/chart?devices={{devices}}&from=2018-08-01 00:00:00&resolution={{resolution}}",
+					"raw": "{{SmsHost}}/printbeat/externalApi/v1/oee/chart?devices={{devices}}&from=2022-12-01 00:00:00&resolution={{resolution}}",
 					"host": [
 						"{{SmsHost}}"
 					],
@@ -408,7 +570,7 @@
 						},
 						{
 							"key": "from",
-							"value": "2018-08-01 00:00:00"
+							"value": "2022-12-01 00:00:00"
 						},
 						{
 							"key": "resolution",
@@ -425,8 +587,6 @@
 				{
 					"listen": "prerequest",
 					"script": {
-						"id": "a4763017-aec4-4f49-af2a-9045c921863c",
-						"type": "text/javascript",
 						"exec": [
 							"var key = postman.getEnvironmentVariable(\"key\");",
 							"var secret = postman.getEnvironmentVariable(\"secret\");",
@@ -441,16 +601,17 @@
 							"    ",
 							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
 							"    console.log('Creating hash with string ', toSign);",
-							"    var hash = CryptoJS.HmacSHA1(toSign, secret);",
+							"    var hash = CryptoJS.HmacSHA256(toSign, secret);",
 							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
 							"    var headers = [",
 							"      key + \":\" + sig,",
 							"      timestamp,",
-							"      \"SHA1\"",
+							"      \"SHA256\"",
 							"    ];",
 							"    return headers;",
 							"}"
-						]
+						],
+						"type": "text/javascript"
 					}
 				}
 			],
@@ -468,14 +629,15 @@
 					{
 						"key": "x-hp-hmac-date",
 						"value": "{{timestamp}}"
+					},
+					{
+						"key": "x-hp-hmac-algorithm",
+						"value": "SHA256",
+						"type": "text"
 					}
 				],
-				"body": {
-					"mode": "raw",
-					"raw": ""
-				},
 				"url": {
-					"raw": "{{SmsHost}}/printbeat/externalApi/v1/oee/drilldown?devices={{devices}}&from=2018-08-01 00:00:00&resolution={{resolution}}",
+					"raw": "{{SmsHost}}/printbeat/externalApi/v1/oee/drilldown?devices={{devices}}&from=2022-12-01 00:00:00&resolution={{resolution}}",
 					"host": [
 						"{{SmsHost}}"
 					],
@@ -493,7 +655,7 @@
 						},
 						{
 							"key": "from",
-							"value": "2018-08-01 00:00:00"
+							"value": "2022-12-01 00:00:00"
 						},
 						{
 							"key": "resolution",
