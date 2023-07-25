@@ -1,0 +1,91 @@
+{
+	"info": {
+		"_postman_id": "47fc4ed1-6392-46c6-885c-879baf4f33d8",
+		"name": "Print Beat Jobs",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Jobs - Print Attempt",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var key = postman.getEnvironmentVariable(\"key\");",
+							"var secret = postman.getEnvironmentVariable(\"secret\");",
+							"var kpi = postman.getEnvironmentVariable(\"kpi\");",
+							"var endpoint = \"/externalApi/jobs\";",
+							"var headers = createHeaders (\"GET\", endpoint );",
+							"",
+							"postman.setEnvironmentVariable(\"hmacHeader\", headers[0]);",
+							"postman.setEnvironmentVariable(\"timestamp\", headers[1]);",
+							"",
+							"function createHeaders(method, path) {",
+							"    var timestamp = (new Date()).toISOString();",
+							"    ",
+							"    var toSign = method.toUpperCase() + \" \" + path + timestamp;",
+							"    console.log('Creating hash with string ', toSign);",
+							"    var hash = CryptoJS.HmacSHA256(toSign, secret);",
+							"    var sig = CryptoJS.enc.Hex.stringify(hash);",
+							"    var headers = [",
+							"      key + \":\" + sig,",
+							"      timestamp,",
+							"      \"SHA256\"",
+							"    ];",
+							"    return headers;",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "x-hp-hmac-authentication",
+						"value": "{{hmacHeader}}"
+					},
+					{
+						"key": "x-hp-hmac-date",
+						"value": "{{timestamp}}"
+					},
+					{
+						"key": "x-hp-hmac-algorithm",
+						"value": "SHA256",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{SmsHost}}/printbeat/externalApi/jobs?sortOrder=DESC",
+					"host": [
+						"{{SmsHost}}"
+					],
+					"path": [
+						"printbeat",
+						"externalApi",
+						"jobs"
+					],
+					"query": [
+						{
+							"key": "devices",
+							"value": "00000000",
+							"disabled": true
+						},
+						{
+							"key": "startMarker",
+							"value": "{{marker}}",
+							"disabled": true
+						},
+						{
+							"key": "sortOrder",
+							"value": "DESC"
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
